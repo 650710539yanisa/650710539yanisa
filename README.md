@@ -44,7 +44,6 @@ Thai (Native) · English (Communicative)
 </p>
 
 ---
-
 ## 📊 GitHub Stats
 
 <p align="center">
@@ -72,7 +71,6 @@ Thai (Native) · English (Communicative)
     alt="Productive Time"
   />
 </p>
-
 ---
 
 <p align="center">
