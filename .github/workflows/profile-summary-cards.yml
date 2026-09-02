@@ -28,7 +28,7 @@ jobs:
           AUTO_PUSH: false
           THEME: "default"
 
-      - name: Apply Pink Minimal Theme
+      - name: Apply Pink High-Contrast Theme
         shell: python
         run: |
           from pathlib import Path
@@ -36,38 +36,40 @@ jobs:
 
           root = Path("profile-summary-card-output/default")
 
-          # Original default-theme colors -> pink palette
+          # Color mapping: Default colors -> High Contrast Pink & Readable Text Palette
           colors = {
-              "#607d8b": "#ec4899",
-              "#455a64": "#be185d",
-              "#37474f": "#6b7280",
+              # --- Titles, Main Text & Numbers (เน้นให้อ่านชัดเจน ไม่จม) ---
+              "#607d8b": "#db2777",  # Header / Titles (Rose Pink 600)
+              "#455a64": "#9d174d",  # Sub-titles / Important labels (Deep Pink 800)
+              "#37474f": "#1f2937",  # Body text / Numbers (Dark Slate - อ่านง่าย คมชัด)
 
-              "#f44336": "#f9a8d4",
-              "#e91e63": "#ec4899",
-              "#9c27b0": "#f472b6",
-              "#673ab7": "#f9a8d4",
-              "#3f51b5": "#ec4899",
-              "#2196f3": "#f472b6",
-              "#03a9f4": "#f9a8d4",
-              "#00bcd4": "#fbcfe8",
+              # --- Chart Slices & Languages (เฉดชมพูเข้ม-บานเย็น ไม่ใช้สีพาสเทลอ่อนเกินไป) ---
+              "#f44336": "#f43f5e",  # Rose
+              "#e91e63": "#ec4899",  # Pink
+              "#9c27b0": "#d946ef",  # Fuchsia
+              "#673ab7": "#c026d3",  # Deep Fuchsia
+              "#3f51b5": "#be185d",  # Dark Pink
+              "#2196f3": "#fb7185",  # Soft Rose
+              "#03a9f4": "#e11d48",  # Ruby
+              "#00bcd4": "#831843",  # Wine Pink
 
-              "#4caf50": "#f472b6",
-              "#8bc34a": "#f9a8d4",
-              "#cddc39": "#fbcfe8",
+              "#4caf50": "#f472b6",  # Light Pink Accent
+              "#8bc34a": "#db2777",  # Pink 600
+              "#cddc39": "#ec4899",  # Pink 500
 
-              "#ffeb3b": "#fbcfe8",
-              "#ffc107": "#f9a8d4",
-              "#ff9800": "#f472b6",
-              "#ff5722": "#ec4899",
+              "#ffeb3b": "#fda4af",  # Rose Accent
+              "#ffc107": "#f43f5e",  # Rose 500
+              "#ff9800": "#be185d",  # Pink 700
+              "#ff5722": "#9d174d",  # Pink 800
 
-              "#795548": "#be185d",
-              "#9e9e9e": "#9ca3af",
+              "#795548": "#831843",  # Deep Wine
+              "#9e9e9e": "#4b5563",  # Muted Dark Gray for subtext
           }
 
           for svg in root.glob("*.svg"):
               text = svg.read_text(encoding="utf-8")
 
-              # Replace only known theme colors.
+              # Replace theme colors
               for old, new in colors.items():
                   text = re.sub(
                       old,
@@ -76,7 +78,7 @@ jobs:
                       flags=re.IGNORECASE
                   )
 
-              # Keep all white backgrounds white.
+              # Keep all card backgrounds crisp white
               text = re.sub(
                   r'fill=["\']#(?:fff|ffffff)["\']',
                   'fill="#FFFFFF"',
@@ -84,7 +86,6 @@ jobs:
                   flags=re.IGNORECASE
               )
 
-              # Keep card backgrounds white.
               text = re.sub(
                   r'(fill:\s*)#(?:fff|ffffff)',
                   r'\1#FFFFFF',
@@ -94,7 +95,7 @@ jobs:
 
               svg.write_text(text, encoding="utf-8")
 
-          print("Pink Minimal theme applied.")
+          print("Pink High-Contrast theme applied successfully.")
 
       - name: Move cards to pink folder
         run: |
@@ -111,6 +112,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "chore: update pink profile summary cards"
+            git commit -m "chore: update pink high-contrast profile summary cards"
             git push
           fi
