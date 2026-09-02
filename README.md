@@ -44,17 +44,19 @@ Thai (Native) · English (Communicative)
 </p>
 
 ---
-```markdown
+
 ## 📊 GitHub Stats
 
 <p align="center">
   <img
     src="./profile-summary-card-output/3-stats.svg"
     width="48%"
+    alt="GitHub Stats"
   />
   <img
     src="./profile-summary-card-output/2-most-commit-language.svg"
     width="48%"
+    alt="Most Used Languages"
   />
 </p>
 
@@ -62,23 +64,12 @@ Thai (Native) · English (Communicative)
   <img
     src="./profile-summary-card-output/1-repos-per-language.svg"
     width="48%"
+    alt="Repositories per Language"
   />
   <img
     src="./profile-summary-card-output/4-productive-time.svg"
     width="48%"
-  />
-</p>
-```
-
-
----
-
-## 📈 GitHub Activity
-
-<p align="center">
-  <img
-    src="https://streak-stats.demolab.com/?user=650710539yanisa&hide_border=true&ring=ec4899&fire=ec4899&currStreakLabel=ec4899&sideLabels=6b7280&dates=9ca3af"
-    width="60%"
+    alt="Productive Time"
   />
 </p>
 
