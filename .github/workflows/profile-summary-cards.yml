@@ -29,71 +29,79 @@ jobs:
           THEME: "default"
 
       - name: Apply Pink Minimal Theme
+        shell: python
         run: |
-          python3 <<'PY'
-          import re
-          import colorsys
           from pathlib import Path
+          import re
 
-          ROOT = Path("profile-summary-card-output/default")
+          root = Path("profile-summary-card-output/default")
 
-          def pinkify(match):
-              value = match.group(1)
+          # Original default-theme colors -> pink palette
+          colors = {
+              "#607d8b": "#ec4899",
+              "#455a64": "#be185d",
+              "#37474f": "#6b7280",
 
-              if len(value) == 3:
-                  value = ''.join(c * 2 for c in value)
+              "#f44336": "#f9a8d4",
+              "#e91e63": "#ec4899",
+              "#9c27b0": "#f472b6",
+              "#673ab7": "#f9a8d4",
+              "#3f51b5": "#ec4899",
+              "#2196f3": "#f472b6",
+              "#03a9f4": "#f9a8d4",
+              "#00bcd4": "#fbcfe8",
 
-              if len(value) != 6:
-                  return match.group(0)
+              "#4caf50": "#f472b6",
+              "#8bc34a": "#f9a8d4",
+              "#cddc39": "#fbcfe8",
 
-              r = int(value[0:2], 16) / 255
-              g = int(value[2:4], 16) / 255
-              b = int(value[4:6], 16) / 255
+              "#ffeb3b": "#fbcfe8",
+              "#ffc107": "#f9a8d4",
+              "#ff9800": "#f472b6",
+              "#ff5722": "#ec4899",
 
-              h, s, l = colorsys.rgb_to_hls(r, g, b)
+              "#795548": "#be185d",
+              "#9e9e9e": "#9ca3af",
+          }
 
-              # Keep white / near-white backgrounds white
-              if l > 0.92:
-                  new = "FFFFFF"
+          for svg in root.glob("*.svg"):
+              text = svg.read_text(encoding="utf-8")
 
-              # Keep very light gray backgrounds/borders subtle
-              elif l > 0.82 and s < 0.15:
-                  new = "FCE7F3"
+              # Replace only known theme colors.
+              for old, new in colors.items():
+                  text = re.sub(
+                      old,
+                      new,
+                      text,
+                      flags=re.IGNORECASE
+                  )
 
-              # Gray text
-              elif s < 0.15:
-                  new = "6B7280"
+              # Keep all white backgrounds white.
+              text = re.sub(
+                  r'fill=["\']#(?:fff|ffffff)["\']',
+                  'fill="#FFFFFF"',
+                  text,
+                  flags=re.IGNORECASE
+              )
 
-              # Very dark colors -> dark pink
-              elif l < 0.30:
-                  new = "BE185D"
+              # Keep card backgrounds white.
+              text = re.sub(
+                  r'(fill:\s*)#(?:fff|ffffff)',
+                  r'\1#FFFFFF',
+                  text,
+                  flags=re.IGNORECASE
+              )
 
-              # Medium colors -> main pink
-              elif l < 0.60:
-                  new = "EC4899"
+              svg.write_text(text, encoding="utf-8")
 
-              # Light colors -> soft pink
-              else:
-                  new = "F9A8D4"
+          print("Pink Minimal theme applied.")
 
-              return "#" + new
-
-          pattern = re.compile(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})(?![0-9a-fA-F])")
-
-          for file in ROOT.glob("*.svg"):
-              text = file.read_text(encoding="utf-8")
-              text = pattern.sub(pinkify, text)
-              file.write_text(text, encoding="utf-8")
-
-          print("Pink theme applied successfully.")
-          PY
-
-      - name: Move Pink Cards
+      - name: Move cards to pink folder
         run: |
           rm -rf profile-summary-card-output/pink
           mv profile-summary-card-output/default profile-summary-card-output/pink
 
-      - name: Commit Pink Cards
+      - name: Commit and Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
