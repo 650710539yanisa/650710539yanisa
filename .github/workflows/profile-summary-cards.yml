@@ -11,7 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Generate GitHub Profile Summary Cards
+    name: Generate Pink GitHub Profile Summary Cards
 
     steps:
       - name: Checkout repository
@@ -28,28 +28,81 @@ jobs:
           AUTO_PUSH: false
           THEME: "default"
 
-      - name: Apply Pink Theme
+      - name: Apply Pink Minimal Theme
         run: |
-          find profile-summary-card-output -name "*.svg" -type f -exec sed -i \
-            -e 's/#000000/#6B7280/g' \
-            -e 's/#333333/#6B7280/g' \
-            -e 's/#666666/#6B7280/g' \
-            -e 's/#888888/#9CA3AF/g' \
-            -e 's/#FEFEFE/#FFFFFF/g' \
-            -e 's/#FFFFFF/#FFFFFF/g' \
-            {} +
+          python3 <<'PY'
+          import re
+          import colorsys
+          from pathlib import Path
 
-          find profile-summary-card-output -name "*.svg" -type f -exec sed -i \
-            -e 's/#2F80ED/#EC4899/g' \
-            -e 's/#F39C12/#EC4899/g' \
-            -e 's/#27AE60/#EC4899/g' \
-            -e 's/#EB5757/#EC4899/g' \
-            {} +
+          ROOT = Path("profile-summary-card-output/default")
 
-      - name: Commit and Push
+          def pinkify(match):
+              value = match.group(1)
+
+              if len(value) == 3:
+                  value = ''.join(c * 2 for c in value)
+
+              if len(value) != 6:
+                  return match.group(0)
+
+              r = int(value[0:2], 16) / 255
+              g = int(value[2:4], 16) / 255
+              b = int(value[4:6], 16) / 255
+
+              h, s, l = colorsys.rgb_to_hls(r, g, b)
+
+              # Keep white / near-white backgrounds white
+              if l > 0.92:
+                  new = "FFFFFF"
+
+              # Keep very light gray backgrounds/borders subtle
+              elif l > 0.82 and s < 0.15:
+                  new = "FCE7F3"
+
+              # Gray text
+              elif s < 0.15:
+                  new = "6B7280"
+
+              # Very dark colors -> dark pink
+              elif l < 0.30:
+                  new = "BE185D"
+
+              # Medium colors -> main pink
+              elif l < 0.60:
+                  new = "EC4899"
+
+              # Light colors -> soft pink
+              else:
+                  new = "F9A8D4"
+
+              return "#" + new
+
+          pattern = re.compile(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})(?![0-9a-fA-F])")
+
+          for file in ROOT.glob("*.svg"):
+              text = file.read_text(encoding="utf-8")
+              text = pattern.sub(pinkify, text)
+              file.write_text(text, encoding="utf-8")
+
+          print("Pink theme applied successfully.")
+          PY
+
+      - name: Move Pink Cards
+        run: |
+          rm -rf profile-summary-card-output/pink
+          mv profile-summary-card-output/default profile-summary-card-output/pink
+
+      - name: Commit Pink Cards
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add profile-summary-card-output
-          git diff --cached --quiet || git commit -m "chore: update pink profile summary cards"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update pink profile summary cards"
+            git push
+          fi
