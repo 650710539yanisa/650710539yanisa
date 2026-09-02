@@ -25,5 +25,31 @@ jobs:
           USERNAME: 650710539yanisa
           BRANCH_NAME: "main"
           UTC_OFFSET: 7
-          AUTO_PUSH: true
-          THEME: "rose_pine"
+          AUTO_PUSH: false
+          THEME: "default"
+
+      - name: Apply Pink Theme
+        run: |
+          find profile-summary-card-output -name "*.svg" -type f -exec sed -i \
+            -e 's/#000000/#6B7280/g' \
+            -e 's/#333333/#6B7280/g' \
+            -e 's/#666666/#6B7280/g' \
+            -e 's/#888888/#9CA3AF/g' \
+            -e 's/#FEFEFE/#FFFFFF/g' \
+            -e 's/#FFFFFF/#FFFFFF/g' \
+            {} +
+
+          find profile-summary-card-output -name "*.svg" -type f -exec sed -i \
+            -e 's/#2F80ED/#EC4899/g' \
+            -e 's/#F39C12/#EC4899/g' \
+            -e 's/#27AE60/#EC4899/g' \
+            -e 's/#EB5757/#EC4899/g' \
+            {} +
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile-summary-card-output
+          git diff --cached --quiet || git commit -m "chore: update pink profile summary cards"
+          git push
