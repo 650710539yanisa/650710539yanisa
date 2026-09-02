@@ -1,5 +1,5 @@
 ```yaml
-name: GitHub-Profile-Summary-Cards
+name: GitHub Profile Summary Cards
 
 on:
   schedule:
@@ -9,14 +9,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Generate GitHub Profile Summary Cards
+
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Generate GitHub Profile Summary Cards
+      - name: Generate Profile Summary Cards
         uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           USERNAME: 650710539yanisa
+          BRANCH_NAME: "main"
+          UTC_OFFSET: 7
+          AUTO_PUSH: true
+          THEME: "github"
 ```
