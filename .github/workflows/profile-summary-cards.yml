@@ -28,74 +28,62 @@ jobs:
           AUTO_PUSH: false
           THEME: "default"
 
-      - name: Apply Pink High-Contrast Theme
+      - name: Apply Real Pink Theme
         shell: python
         run: |
           from pathlib import Path
           import re
 
           root = Path("profile-summary-card-output/default")
-
-          # Color mapping: Default colors -> High Contrast Pink & Readable Text Palette
-          colors = {
-              # --- Titles, Main Text & Numbers (เน้นให้อ่านชัดเจน ไม่จม) ---
-              "#607d8b": "#db2777",  # Header / Titles (Rose Pink 600)
-              "#455a64": "#9d174d",  # Sub-titles / Important labels (Deep Pink 800)
-              "#37474f": "#1f2937",  # Body text / Numbers (Dark Slate - อ่านง่าย คมชัด)
-
-              # --- Chart Slices & Languages (เฉดชมพูเข้ม-บานเย็น ไม่ใช้สีพาสเทลอ่อนเกินไป) ---
-              "#f44336": "#f43f5e",  # Rose
-              "#e91e63": "#ec4899",  # Pink
-              "#9c27b0": "#d946ef",  # Fuchsia
-              "#673ab7": "#c026d3",  # Deep Fuchsia
-              "#3f51b5": "#be185d",  # Dark Pink
-              "#2196f3": "#fb7185",  # Soft Rose
-              "#03a9f4": "#e11d48",  # Ruby
-              "#00bcd4": "#831843",  # Wine Pink
-
-              "#4caf50": "#f472b6",  # Light Pink Accent
-              "#8bc34a": "#db2777",  # Pink 600
-              "#cddc39": "#ec4899",  # Pink 500
-
-              "#ffeb3b": "#fda4af",  # Rose Accent
-              "#ffc107": "#f43f5e",  # Rose 500
-              "#ff9800": "#be185d",  # Pink 700
-              "#ff5722": "#9d174d",  # Pink 800
-
-              "#795548": "#831843",  # Deep Wine
-              "#9e9e9e": "#4b5563",  # Muted Dark Gray for subtext
-          }
+          
+          # เฉดสีชมพูสำหรับชาร์ตวงกลม (เรียงตามลำดับความนิยม)
+          pink_donut_palette = [
+              "#db2777",  # Pink เข้ม (อันดับ 1)
+              "#f43f5e",  # Rose
+              "#ec4899",  # Hot Pink
+              "#f472b6",  # Light Rose
+              "#c026d3",  # Fuchsia/Berry
+              "#fb7185",  # Soft Pink
+              "#9d174d",  # Deep Wine Pink
+              "#fda4af",  # Pastel Rose
+          ]
 
           for svg in root.glob("*.svg"):
               text = svg.read_text(encoding="utf-8")
 
-              # Replace theme colors
-              for old, new in colors.items():
-                  text = re.sub(
-                      old,
-                      new,
-                      text,
-                      flags=re.IGNORECASE
-                  )
+              # 1. เปลี่ยนเส้นขอบการ์ดให้เป็นสีชมพูอ่อน
+              text = re.sub(r'stroke="#e4e2e2"', 'stroke="#fbcfe8"', text, flags=re.IGNORECASE)
+              text = re.sub(r'stroke="#e1e4e8"', 'stroke="#fbcfe8"', text, flags=re.IGNORECASE)
 
-              # Keep all card backgrounds crisp white
-              text = re.sub(
-                  r'fill=["\']#(?:fff|ffffff)["\']',
-                  'fill="#FFFFFF"',
-                  text,
-                  flags=re.IGNORECASE
-              )
+              # 2. เปลี่ยนหัวข้อการ์ด (Top Languages, Stats) ให้เป็นสี Hot Pink
+              text = re.sub(r'fill="#2f363d"', 'fill="#db2777"', text, flags=re.IGNORECASE)
+              text = re.sub(r'fill="#24292e"', 'fill="#db2777"', text, flags=re.IGNORECASE)
 
-              text = re.sub(
-                  r'(fill:\s*)#(?:fff|ffffff)',
-                  r'\1#FFFFFF',
-                  text,
-                  flags=re.IGNORECASE
-              )
+              # 3. เปลี่ยนสีไอคอนแมว GitHub (Octocat) ให้เป็นสีชมพู
+              text = re.sub(r'fill="#586069"', 'fill="#f472b6"', text, flags=re.IGNORECASE)
+              text = re.sub(r'stroke="#586069"', 'stroke="#ec4899"', text, flags=re.IGNORECASE)
 
+              # 4. เปลี่ยนสีกราฟ Contribution (เส้นกราฟและพื้นที่ใต้กราฟ)
+              text = re.sub(r'fill="#9be9a8"', 'fill="#fbcfe8"', text, flags=re.IGNORECASE)
+              text = re.sub(r'fill="#40c463"', 'fill="#f472b6"', text, flags=re.IGNORECASE)
+              text = re.sub(r'fill="#30a14e"', 'fill="#ec4899"', text, flags=re.IGNORECASE)
+              text = re.sub(r'fill="#216e39"', 'fill="#be185d"', text, flags=re.IGNORECASE)
+
+              # 5. กวาดจับสีของภาษาดั้งเดิมทั้งหมดใน Donut Chart & Legend แล้วแทนด้วยเฉดชมพู
+              found_colors = set(re.findall(r'fill="(#[0-9a-fA-F]{6})"', text))
+              # ยกเว้นสีขาวและสีที่เราเซ็ตไว้แล้ว
+              excluded = {"#ffffff", "#ffffff", "#db2777", "#f472b6", "#ec4899", "#fbcfe8", "#be185d"}
+              donut_colors = [c for c in found_colors if c.lower() not in excluded]
+
+              for idx, color in enumerate(donut_colors):
+                  replacement_pink = pink_donut_palette[idx % len(pink_donut_palette)]
+                  text = re.sub(f'fill="{color}"', f'fill="{replacement_pink}"', text, flags=re.IGNORECASE)
+                  text = re.sub(f'stroke="{color}"', f'stroke="{replacement_pink}"', text, flags=re.IGNORECASE)
+
+              # บันทึกไฟล์กลับ
               svg.write_text(text, encoding="utf-8")
 
-          print("Pink High-Contrast theme applied successfully.")
+          print("Pink aesthetic successfully applied to all elements!")
 
       - name: Move cards to pink folder
         run: |
@@ -112,6 +100,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "chore: update pink high-contrast profile summary cards"
+            git commit -m "chore: apply proper pink theme to summary cards"
             git push
           fi
