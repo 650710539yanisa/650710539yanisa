@@ -45,19 +45,15 @@ Thai (Native) · English (Communicative)
 
 ---
 
-## GitHub Stats
+### 🌸 GitHub Profile Summary
 
 <p align="center">
-  <img
-    src="./profile-summary-card-output/pink/3-stats.svg"
-    width="49%"
-    alt="GitHub Stats"
-  />
-  <img
-    src="./profile-summary-card-output/pink/2-most-commit-language.svg"
-    width="49%"
-    alt="Most Used Languages"
-  />
+  <img src="profile-summary-card-output/pink/0-profile-details.svg" width="49%" />
+  <img src="profile-summary-card-output/pink/1-repos-per-language.svg" width="49%" />
+</p>
+<p align="center">
+  <img src="profile-summary-card-output/pink/2-most-commit-language.svg" width="49%" />
+  <img src="profile-summary-card-output/pink/3-stats.svg" width="49%" />
 </p>
 
 ---
