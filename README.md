@@ -44,19 +44,32 @@ Thai (Native) · English (Communicative)
 </p>
 
 ---
-
+```markdown
 ## 📊 GitHub Stats
 
 <p align="center">
   <img
-    src="https://github-readme-stats.vercel.app/api?username=650710539yanisa&show_icons=true&hide_border=true&title_color=ec4899&icon_color=ec4899&text_color=6b7280"
+    src="./profile-summary-card-output/3-stats.svg"
     width="48%"
   />
   <img
-    src="https://github-readme-stats.vercel.app/api/top-langs/?username=650710539yanisa&layout=compact&hide_border=true&title_color=ec4899&text_color=6b7280"
-    width="41%"
+    src="./profile-summary-card-output/2-most-commit-language.svg"
+    width="48%"
   />
 </p>
+
+<p align="center">
+  <img
+    src="./profile-summary-card-output/1-repos-per-language.svg"
+    width="48%"
+  />
+  <img
+    src="./profile-summary-card-output/4-productive-time.svg"
+    width="48%"
+  />
+</p>
+```
+
 
 ---
 
