@@ -1,3 +1,4 @@
+```yaml
 name: GitHub Profile Summary Cards
 
 on:
@@ -35,60 +36,324 @@ jobs:
           import re
 
           root = Path("profile-summary-card-output/default")
-          
-          # เฉดสีชมพูสำหรับชาร์ตวงกลม (เรียงตามลำดับความนิยม)
+
+          # ============================================================
+          # PINK PALETTES
+          # ============================================================
+
+          # ชมพูสำหรับ Donut / Languages
           pink_donut_palette = [
-              "#db2777",  # Pink เข้ม (อันดับ 1)
+              "#db2777",  # Deep Pink
               "#f43f5e",  # Rose
               "#ec4899",  # Hot Pink
-              "#f472b6",  # Light Rose
-              "#c026d3",  # Fuchsia/Berry
-              "#fb7185",  # Soft Pink
-              "#9d174d",  # Deep Wine Pink
+              "#f472b6",  # Light Pink
+              "#c026d3",  # Fuchsia
+              "#fb7185",  # Soft Rose
+              "#9d174d",  # Deep Wine
               "#fda4af",  # Pastel Rose
           ]
 
+          # ชมพูสำหรับกราฟ
+          pink_chart_palette = [
+              "#fce7f3",
+              "#fbcfe8",
+              "#f9a8d4",
+              "#f472b6",
+              "#ec4899",
+              "#db2777",
+              "#be185d",
+          ]
+
+          # ============================================================
+          # PROCESS ALL SVG FILES
+          # ============================================================
+
           for svg in root.glob("*.svg"):
+
               text = svg.read_text(encoding="utf-8")
 
-              # 1. เปลี่ยนเส้นขอบการ์ดให้เป็นสีชมพูอ่อน
-              text = re.sub(r'stroke="#e4e2e2"', 'stroke="#fbcfe8"', text, flags=re.IGNORECASE)
-              text = re.sub(r'stroke="#e1e4e8"', 'stroke="#fbcfe8"', text, flags=re.IGNORECASE)
+              # ========================================================
+              # 1. CARD BORDER
+              # ========================================================
 
-              # 2. เปลี่ยนหัวข้อการ์ด (Top Languages, Stats) ให้เป็นสี Hot Pink
-              text = re.sub(r'fill="#2f363d"', 'fill="#db2777"', text, flags=re.IGNORECASE)
-              text = re.sub(r'fill="#24292e"', 'fill="#db2777"', text, flags=re.IGNORECASE)
+              text = re.sub(
+                  r'stroke="#e4e2e2"',
+                  'stroke="#fbcfe8"',
+                  text,
+                  flags=re.IGNORECASE
+              )
 
-              # 3. เปลี่ยนสีไอคอนแมว GitHub (Octocat) ให้เป็นสีชมพู
-              text = re.sub(r'fill="#586069"', 'fill="#f472b6"', text, flags=re.IGNORECASE)
-              text = re.sub(r'stroke="#586069"', 'stroke="#ec4899"', text, flags=re.IGNORECASE)
+              text = re.sub(
+                  r'stroke="#e1e4e8"',
+                  'stroke="#fbcfe8"',
+                  text,
+                  flags=re.IGNORECASE
+              )
 
-              # 4. เปลี่ยนสีกราฟ Contribution (เส้นกราฟและพื้นที่ใต้กราฟ)
-              text = re.sub(r'fill="#9be9a8"', 'fill="#fbcfe8"', text, flags=re.IGNORECASE)
-              text = re.sub(r'fill="#40c463"', 'fill="#f472b6"', text, flags=re.IGNORECASE)
-              text = re.sub(r'fill="#30a14e"', 'fill="#ec4899"', text, flags=re.IGNORECASE)
-              text = re.sub(r'fill="#216e39"', 'fill="#be185d"', text, flags=re.IGNORECASE)
+              # ========================================================
+              # 2. HEADINGS / MAIN TEXT
+              # ========================================================
 
-              # 5. กวาดจับสีของภาษาดั้งเดิมทั้งหมดใน Donut Chart & Legend แล้วแทนด้วยเฉดชมพู
-              found_colors = set(re.findall(r'fill="(#[0-9a-fA-F]{6})"', text))
-              # ยกเว้นสีขาวและสีที่เราเซ็ตไว้แล้ว
-              excluded = {"#ffffff", "#ffffff", "#db2777", "#f472b6", "#ec4899", "#fbcfe8", "#be185d"}
-              donut_colors = [c for c in found_colors if c.lower() not in excluded]
+              text = re.sub(
+                  r'fill="#2f363d"',
+                  'fill="#db2777"',
+                  text,
+                  flags=re.IGNORECASE
+              )
+
+              text = re.sub(
+                  r'fill="#24292e"',
+                  'fill="#db2777"',
+                  text,
+                  flags=re.IGNORECASE
+              )
+
+              # ========================================================
+              # 3. OCTOCAT / ICONS
+              # ========================================================
+
+              text = re.sub(
+                  r'fill="#586069"',
+                  'fill="#f472b6"',
+                  text,
+                  flags=re.IGNORECASE
+              )
+
+              text = re.sub(
+                  r'stroke="#586069"',
+                  'stroke="#ec4899"',
+                  text,
+                  flags=re.IGNORECASE
+              )
+
+              # ========================================================
+              # 4. GITHUB CONTRIBUTION COLORS
+              # ========================================================
+
+              contribution_colors = {
+                  "#9be9a8": "#fce7f3",
+                  "#40c463": "#f9a8d4",
+                  "#30a14e": "#ec4899",
+                  "#216e39": "#be185d",
+              }
+
+              for old_color, new_color in contribution_colors.items():
+
+                  text = re.sub(
+                      rf'fill="{old_color}"',
+                      f'fill="{new_color}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+                  text = re.sub(
+                      rf'stroke="{old_color}"',
+                      f'stroke="{new_color}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+              # ========================================================
+              # 5. COMMON GRAPH COLORS
+              # ========================================================
+
+              graph_color_map = {
+
+                  # Blue
+                  "#79c0ff": "#f9a8d4",
+                  "#58a6ff": "#f472b6",
+                  "#1f6feb": "#db2777",
+                  "#0969da": "#ec4899",
+
+                  # Purple
+                  "#a371f7": "#d946ef",
+                  "#bc8cff": "#f0abfc",
+                  "#8250df": "#c026d3",
+
+                  # Green
+                  "#56d364": "#f472b6",
+                  "#3fb950": "#ec4899",
+                  "#2ea44f": "#db2777",
+                  "#238636": "#be185d",
+
+                  # Cyan
+                  "#00b4d8": "#f472b6",
+
+                  # Gray
+                  "#8b949e": "#f9a8d4",
+                  "#6e7681": "#f472b6",
+
+                  # Red
+                  "#ff0000": "#db2777",
+              }
+
+              for old_color, new_color in graph_color_map.items():
+
+                  text = re.sub(
+                      rf'fill="{old_color}"',
+                      f'fill="{new_color}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+                  text = re.sub(
+                      rf'stroke="{old_color}"',
+                      f'stroke="{new_color}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+              # ========================================================
+              # 6. DONUT CHART
+              # ========================================================
+
+              found_colors = set(
+                  re.findall(
+                      r'fill="(#[0-9a-fA-F]{6})"',
+                      text
+                  )
+              )
+
+              excluded = {
+                  "#ffffff",
+                  "#db2777",
+                  "#f472b6",
+                  "#ec4899",
+                  "#fbcfe8",
+                  "#be185d",
+                  "#fce7f3",
+                  "#f9a8d4",
+                  "#f43f5e",
+                  "#c026d3",
+                  "#fb7185",
+                  "#9d174d",
+                  "#fda4af",
+              }
+
+              donut_colors = [
+                  color
+                  for color in found_colors
+                  if color.lower() not in excluded
+              ]
 
               for idx, color in enumerate(donut_colors):
-                  replacement_pink = pink_donut_palette[idx % len(pink_donut_palette)]
-                  text = re.sub(f'fill="{color}"', f'fill="{replacement_pink}"', text, flags=re.IGNORECASE)
-                  text = re.sub(f'stroke="{color}"', f'stroke="{replacement_pink}"', text, flags=re.IGNORECASE)
 
-              # บันทึกไฟล์กลับ
-              svg.write_text(text, encoding="utf-8")
+                  replacement_pink = pink_donut_palette[
+                      idx % len(pink_donut_palette)
+                  ]
 
-          print("Pink aesthetic successfully applied to all elements!")
+                  text = re.sub(
+                      rf'fill="{re.escape(color)}"',
+                      f'fill="{replacement_pink}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+                  text = re.sub(
+                      rf'stroke="{re.escape(color)}"',
+                      f'stroke="{replacement_pink}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+              # ========================================================
+              # 7. GRAPH AREA / PATH / LINE COLORS
+              # ========================================================
+
+              # สีที่มักพบในกราฟของ Profile Summary Cards
+              remaining_chart_colors = [
+                  "#0000ff",
+                  "#00ff00",
+                  "#00b4d8",
+                  "#2ea44f",
+                  "#238636",
+                  "#8250df",
+                  "#0969da",
+                  "#56d364",
+                  "#3fb950",
+              ]
+
+              for idx, old_color in enumerate(
+                  remaining_chart_colors
+              ):
+
+                  new_color = pink_chart_palette[
+                      idx % len(pink_chart_palette)
+                  ]
+
+                  text = re.sub(
+                      rf'fill="{old_color}"',
+                      f'fill="{new_color}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+                  text = re.sub(
+                      rf'stroke="{old_color}"',
+                      f'stroke="{new_color}"',
+                      text,
+                      flags=re.IGNORECASE
+                  )
+
+              # ========================================================
+              # 8. CSS STYLE COLORS INSIDE SVG
+              # ========================================================
+
+              style_color_map = {
+                  "#9be9a8": "#fce7f3",
+                  "#40c463": "#f9a8d4",
+                  "#30a14e": "#ec4899",
+                  "#216e39": "#be185d",
+
+                  "#79c0ff": "#f9a8d4",
+                  "#58a6ff": "#f472b6",
+                  "#1f6feb": "#db2777",
+
+                  "#a371f7": "#d946ef",
+                  "#bc8cff": "#f0abfc",
+
+                  "#56d364": "#f472b6",
+                  "#3fb950": "#ec4899",
+
+                  "#8b949e": "#f9a8d4",
+                  "#6e7681": "#f472b6",
+              }
+
+              for old_color, new_color in style_color_map.items():
+
+                  text = text.replace(
+                      old_color,
+                      new_color
+                  )
+
+                  text = text.replace(
+                      old_color.upper(),
+                      new_color
+                  )
+
+              # ========================================================
+              # 9. SAVE SVG
+              # ========================================================
+
+              svg.write_text(
+                  text,
+                  encoding="utf-8"
+              )
+
+              print(f"Pink theme applied: {svg.name}")
+
+          print("")
+          print("==============================================")
+          print(" Pink aesthetic successfully applied!")
+          print(" Cards + Charts + Donuts + Contributions")
+          print("==============================================")
+
 
       - name: Move cards to pink folder
         run: |
           rm -rf profile-summary-card-output/pink
           mv profile-summary-card-output/default profile-summary-card-output/pink
+
 
       - name: Commit and Push
         run: |
@@ -103,3 +368,4 @@ jobs:
             git commit -m "chore: apply proper pink theme to summary cards"
             git push
           fi
+```
