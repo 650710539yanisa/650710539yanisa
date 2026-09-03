@@ -1,4 +1,4 @@
-```yaml
+
 name: GitHub Profile Summary Cards
 
 on:
@@ -204,4 +204,4 @@ jobs:
             git commit -m "chore: apply pink theme to summary cards"
             git push
           fi
-```
+
